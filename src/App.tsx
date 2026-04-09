@@ -464,7 +464,7 @@ export default function App() {
       {/* Section 6: Como Funciona */}
       <section 
         className="relative py-24 lg:py-32 bg-fixed bg-center bg-cover" 
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')" }}
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1606811841689-23dfddce3e95?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')" }}
       >
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#1a457c]/95 to-[#1a457c]/85"></div>

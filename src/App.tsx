@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle2, 
-  MessageCircle, 
   AlertCircle, 
   Frown, 
   CameraOff, 
@@ -13,6 +12,8 @@ import {
   Clock, 
   ChevronDown, 
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Instagram,
   ArrowRight,
   Check,
@@ -32,16 +33,136 @@ import {
 const PRIMARY_COLOR = '#1a457c';
 const WHATSAPP_GREEN = '#25D366';
 
-function Button({ children, className = '', variant = 'primary', ...props }: any) {
+/** +55 61 8230-0181 — sem espaços para wa.me */
+const WHATSAPP_E164 = '556182300181';
+const WHATSAPP_PRESET_MESSAGE = 'Olá, quero fazer um agendamento';
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_E164}?text=${encodeURIComponent(WHATSAPP_PRESET_MESSAGE)}`;
+
+const COMPARISON_ROWS = [
+  { trait: 'Planejamento', conventional: 'Moldes de massinha (desconfortáveis)', odonto: 'Camera Intraoral (rápido e limpo)' },
+  { trait: 'Previsibilidade', conventional: 'Surpresa no final do tratamento', odonto: 'Aprova o sorriso antes de começar (DDS)' },
+  { trait: 'Naturalidade', conventional: 'Dentes opacos e artificiais (“tecla de piano”)', odonto: 'Translucidez e textura de dente natural' },
+  { trait: 'Dor no implante', conventional: 'Pós-operatório doloroso e inchado', odonto: 'Cirurgia guiada minimamente invasiva' },
+  { trait: 'Tempo de resultado', conventional: 'Meses de espera', odonto: 'Dias (ou até carga imediata)' },
+  { trait: 'Durabilidade', conventional: 'Manutenção frequente', odonto: 'Materiais premium de altíssima duração' },
+] as const;
+
+const HERO_CAROUSEL_SLIDES = [
+  {
+    src: '/img-1-carrossel.jpeg',
+    alt: 'Antes e depois do tratamento: evolução do sorriso com estética avançada.',
+  },
+  {
+    src: '/img-2-carrossel.jpeg',
+    alt: 'Antes e depois de clareamento dental realizado na clínica.',
+  },
+] as const;
+
+function HeroCarousel() {
+  const [active, setActive] = useState(0);
+  const len = HERO_CAROUSEL_SLIDES.length;
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setActive((a) => (a + 1) % len);
+    }, 5500);
+    return () => window.clearInterval(id);
+  }, [len]);
+
+  const go = (delta: number) => {
+    setActive((a) => (a + delta + len) % len);
+  };
+
+  return (
+    <div className="relative h-[280px] w-full sm:h-[360px] lg:h-[460px]">
+      {HERO_CAROUSEL_SLIDES.map((slide, idx) => (
+        <img
+          key={slide.src}
+          src={slide.src}
+          alt={slide.alt}
+          loading={idx === 0 ? 'eager' : 'lazy'}
+          decoding="async"
+          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ease-out ${
+            idx === active ? 'z-[1] opacity-100' : 'z-0 opacity-0'
+          }`}
+        />
+      ))}
+
+      <button
+        type="button"
+        onClick={() => go(-1)}
+        className="absolute left-2 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#1a457c] shadow-md backdrop-blur-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a457c] md:left-3"
+        aria-label="Imagem anterior"
+      >
+        <ChevronLeft className="h-6 w-6" />
+      </button>
+      <button
+        type="button"
+        onClick={() => go(1)}
+        className="absolute right-2 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#1a457c] shadow-md backdrop-blur-sm transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a457c] md:right-3"
+        aria-label="Próxima imagem"
+      >
+        <ChevronRight className="h-6 w-6" />
+      </button>
+
+      <div
+        className="absolute top-4 left-0 right-0 z-[2] flex justify-center gap-2"
+        role="tablist"
+        aria-label="Selecionar imagem do carrossel"
+      >
+        {HERO_CAROUSEL_SLIDES.map((_, idx) => (
+          <button
+            key={idx}
+            type="button"
+            role="tab"
+            aria-selected={idx === active}
+            aria-label={`Imagem ${idx + 1} de ${len}`}
+            onClick={() => setActive(idx)}
+            className={`h-2 rounded-full transition-all ${
+              idx === active ? 'w-8 bg-white shadow' : 'w-2 bg-white/50 hover:bg-white/80'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Marca WhatsApp (glyph oficial), herda `currentColor` via `fill`. */
+function WhatsAppIcon({ className, ...props }: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden
+      {...props}
+    >
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  );
+}
+
+function Button({ children, className = '', variant = 'primary', href, ...props }: any) {
   const baseStyle = "inline-flex items-center justify-center font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1";
   const variants = {
     primary: "bg-[#25D366] text-white hover:bg-[#20bd5a]",
     secondary: "bg-[#1a457c] text-white hover:bg-[#12315a]",
     outline: "border-2 border-[#1a457c] text-[#1a457c] hover:bg-[#1a457c] hover:text-white"
   };
-  
+  const cls = `${baseStyle} ${variants[variant as keyof typeof variants]} ${className}`;
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cls} {...props}>
+        {children}
+      </a>
+    );
+  }
+
   return (
-    <button className={`${baseStyle} ${variants[variant as keyof typeof variants]} ${className}`} {...props}>
+    <button type="button" className={cls} {...props}>
       {children}
     </button>
   );
@@ -70,26 +191,52 @@ export default function App() {
     <div className="font-sans text-gray-800 bg-white selection:bg-[#1a457c] selection:text-white">
       
       {/* Header / Navbar */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Smile className="w-8 h-8 text-[#1a457c]" />
-            <span className="text-2xl font-bold text-[#1a457c] tracking-tight">OdontoSmart</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#tratamentos" className="text-gray-600 hover:text-[#1a457c] font-medium transition-colors">Tratamentos</a>
-            <a href="#diferenciais" className="text-gray-600 hover:text-[#1a457c] font-medium transition-colors">Diferenciais</a>
-            <a href="#faq" className="text-gray-600 hover:text-[#1a457c] font-medium transition-colors">Dúvidas</a>
-            <Button className="px-6 py-2.5 text-sm">
-              <MessageCircle className="w-4 h-4 mr-2" />
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-none">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0 flex items-center justify-between">
+          <a
+            href="#"
+            className="flex min-w-0 max-w-[min(100%,calc(100vw-10rem))] shrink-0 items-center gap-2.5 leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a457c] focus-visible:ring-offset-0 rounded-md sm:max-w-none sm:gap-3 md:gap-4"
+            aria-label="OdontoSmart — Sorriso em excelência"
+          >
+            <img
+              src="/logo-icon.png"
+              alt=""
+              className="h-11 w-auto shrink-0 object-contain sm:h-[3.25rem] md:h-[3.75rem] lg:h-[4.25rem] xl:h-[4.75rem]"
+              width={112}
+              height={112}
+              decoding="async"
+            />
+            <div className="min-w-0 flex-1 text-left font-[Montserrat,sans-serif] sm:flex-none">
+              <span className="block text-[1.05rem] uppercase leading-[1.05] tracking-[-0.02em] text-[#1a457c] sm:text-[1.35rem] md:text-[1.5rem] lg:text-[1.65rem] xl:text-[1.75rem]">
+                <span className="font-bold">ODONTO</span>
+                <span className="font-medium">SMART</span>
+              </span>
+              <div className="mt-[0.3rem] flex items-center gap-1.5 sm:mt-[0.35rem] sm:gap-2 md:gap-2.5">
+                <span
+                  className="h-px min-w-[1.25rem] flex-1 bg-[#1a457c]/45 sm:min-w-[2rem] md:min-w-[2.5rem]"
+                  aria-hidden
+                />
+                <span className="shrink-0 text-[0.45rem] font-normal uppercase leading-none tracking-[0.2em] text-[#1a457c] sm:text-[0.5rem] sm:tracking-[0.22em] md:text-[0.5625rem] lg:text-[0.625rem]">
+                  SORRISO EM EXCELÊNCIA
+                </span>
+              </div>
+            </div>
+          </a>
+          <div className="hidden md:flex items-center gap-6 lg:gap-7">
+            <a href="#tratamentos" className="text-gray-600 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight">Tratamentos</a>
+            <a href="#diferenciais" className="text-gray-600 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight">Diferenciais</a>
+            <a href="#faq" className="text-gray-600 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight">Dúvidas</a>
+            <Button href={WHATSAPP_URL} className="px-5 py-2.5 text-sm lg:text-base min-h-0 shadow-md hover:shadow-lg hover:-translate-y-px">
+              <WhatsAppIcon className="w-4 h-4 shrink-0 lg:w-5 lg:h-5 mr-2" />
               Agendar Consulta
             </Button>
           </div>
         </div>
       </header>
 
+      <div className="pt-[4.5rem] sm:pt-24 md:pt-28 lg:pt-28 xl:pt-32">
       {/* Section 1: Hero */}
-      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-32 overflow-hidden bg-white">
+      <section className="relative pt-0 pb-20 lg:pb-32 overflow-hidden bg-white">
         {/* Subtle background glow */}
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 pointer-events-none">
           <div className="w-[500px] h-[500px] md:w-[800px] md:h-[800px] rounded-full bg-blue-50/80 blur-3xl"></div>
@@ -100,29 +247,24 @@ export default function App() {
             
             {/* Text Content */}
             <div className="lg:col-span-7 max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-[#1a457c] text-xs sm:text-sm font-semibold mb-6 md:mb-8 border border-blue-100">
-                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>Odontologia Estética Avançada</span>
-              </div>
-              
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold text-[#1a457c] leading-[1.15] tracking-tight mb-4 md:mb-6">
                 Seu sorriso está te impedindo de viver com confiança?
               </h1>
+
+              <div className="mb-6 flex flex-col justify-center gap-4 sm:flex-row md:mb-8 lg:justify-start">
+                <Button href={WHATSAPP_URL} className="px-6 py-5 md:px-8 md:py-4 text-sm sm:text-base md:text-lg w-full sm:w-auto shadow-xl shadow-[#25D366]/20 h-auto whitespace-normal text-center">
+                  <WhatsAppIcon className="w-5 h-5 shrink-0 md:w-6 md:h-6 mr-2" />
+                  <span>QUERO TRANSFORMAR MEU SORRISO PELO WHATSAPP</span>
+                </Button>
+              </div>
               
-              <p className="text-lg sm:text-xl md:text-2xl text-[#1a457c]/80 font-medium mb-4 md:mb-6 leading-snug">
+              <p className="text-lg sm:text-xl md:text-2xl text-[#1a457c]/80 font-medium mb-8 md:mb-10 leading-snug">
                 Descubra como transformar seus dentes em poucos dias sem dor e com resultado definitivo.
               </p>
               
               <p className="text-base sm:text-lg text-gray-600 mb-8 md:mb-10 leading-relaxed">
                 Centenas de pacientes já recuperaram o sorriso, a autoestima e a liberdade de sorrir à vontade com os procedimentos estéticos do Dr. Marcus na OdontoSmart. Implantes definitivos, lentes de contato dental e clareamento de alto impacto com tecnologia de ponta e resultado que você vê no espelho já na primeira sessão.
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 mb-10 justify-center lg:justify-start">
-                <Button className="px-6 py-5 md:px-8 md:py-4 text-sm sm:text-base md:text-lg w-full sm:w-auto shadow-xl shadow-[#25D366]/20 h-auto whitespace-normal text-center">
-                  <MessageCircle className="w-5 h-5 md:w-6 md:h-6 mr-2 flex-shrink-0" />
-                  <span>QUERO TRANSFORMAR MEU SORRISO PELO WHATSAPP</span>
-                </Button>
-              </div>
               
               <div className="flex flex-col gap-3 md:gap-4 text-left inline-flex">
                 <div className="flex items-center text-gray-700 font-medium text-sm sm:text-base">
@@ -146,22 +288,19 @@ export default function App() {
               <div className="absolute inset-0 border-2 border-[#1a457c]/10 rounded-[2rem] md:rounded-[2.5rem] transform translate-x-3 translate-y-3 md:translate-x-6 md:translate-y-6"></div>
               
               <div className="relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 md:border-8 border-white bg-white">
-                <img 
-                  src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                  alt="Paciente sorrindo feliz" 
-                  className="w-full h-[350px] sm:h-[450px] lg:h-[650px] object-cover"
-                  referrerPolicy="no-referrer"
-                />
+                <HeroCarousel />
               </div>
-              
-              {/* Floating badge */}
-              <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-[90%] sm:w-auto sm:translate-x-0 sm:bottom-10 sm:-left-6 lg:-left-10 bg-white p-4 md:p-5 rounded-2xl shadow-xl flex items-center justify-center sm:justify-start gap-3 md:gap-4 border border-gray-100">
-                <div className="bg-[#1a457c] p-2 md:p-3 rounded-full text-white shadow-inner flex-shrink-0">
-                  <StarIcon className="w-5 h-5 md:w-6 md:h-6" />
-                </div>
-                <div className="text-left">
-                  <p className="text-xs md:text-sm text-gray-500 font-medium uppercase tracking-wider">Avaliação</p>
-                  <p className="text-base md:text-xl font-bold text-[#1a457c]">5.0 no Google</p>
+
+              {/* Card de avaliação — abaixo do carrossel */}
+              <div className="relative z-30 mt-4 flex justify-center px-1 sm:mt-5 sm:justify-start sm:px-0 md:mt-6">
+                <div className="flex w-full max-w-sm items-center justify-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-xl sm:max-w-none sm:justify-start sm:gap-4 md:p-4">
+                  <div className="flex-shrink-0 rounded-full bg-[#1a457c] p-2 text-white shadow-inner md:p-2.5">
+                    <StarIcon className="h-5 w-5 md:h-6 md:w-6" />
+                  </div>
+                  <div className="min-w-0 text-left">
+                    <p className="text-[0.65rem] font-medium uppercase tracking-wider text-gray-500 md:text-xs">Avaliação</p>
+                    <p className="text-sm font-bold text-[#1a457c] md:text-lg">5.0 no Google</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -181,10 +320,9 @@ export default function App() {
             <div className="w-full md:w-5/12 relative flex justify-center md:justify-start">
               <div className="relative -mt-20 md:-mt-28 z-10 w-full max-w-[320px] md:max-w-none">
                 <img 
-                  src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                  alt="Dr. Marcus" 
-                  className="w-full h-[350px] md:h-[450px] object-cover rounded-[2rem] shadow-2xl border-4 md:border-8 border-white bg-white"
-                  referrerPolicy="no-referrer"
+                  src="/image-section-problema.png"
+                  alt="Retrato profissional de dentista masculino sorrindo, com jaqueta azul em consultório moderno."
+                  className="w-full h-[350px] md:h-[450px] object-cover object-[center_35%] rounded-[2rem] shadow-2xl border-4 md:border-8 border-white bg-white"
                 />
                 {/* White card overlapping */}
                 <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[85%] bg-white rounded-2xl p-4 md:p-5 shadow-xl text-center border border-gray-100">
@@ -203,7 +341,7 @@ export default function App() {
                 Muitas pessoas deixam de aproveitar os melhores momentos da vida por vergonha do próprio sorriso. Estima-se que mais de 50% dos brasileiros adultos apresentam alguma insatisfação. <br className="hidden md:block" /><br className="hidden md:block" />
                 <span className="font-semibold text-white">Mas a solução é muito mais simples, rápida e indolor do que você imagina.</span>
               </p>
-              <Button className="px-8 py-4 text-sm sm:text-base md:text-lg w-full sm:w-auto shadow-xl shadow-[#25D366]/20">
+              <Button href={WHATSAPP_URL} className="px-8 py-4 text-sm sm:text-base md:text-lg w-full sm:w-auto shadow-xl shadow-[#25D366]/20">
                 QUERO FAZER MINHA CONSULTA
               </Button>
             </div>
@@ -268,7 +406,7 @@ export default function App() {
       </section>
 
       {/* Section 3: A Solução */}
-      <section id="tratamentos" className="py-24 bg-gray-50 relative">
+      <section id="tratamentos" className="scroll-mt-[4.75rem] sm:scroll-mt-28 md:scroll-mt-32 lg:scroll-mt-32 xl:scroll-mt-36 py-24 bg-gray-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -286,7 +424,7 @@ export default function App() {
                   </div>
                   <div>
                     <h4 className="text-xl font-bold text-[#1a457c] mb-1">Consulta digital completa</h4>
-                    <p className="text-gray-600">Scanner intraoral 3D sem moldes de massinha desconfortáveis.</p>
+                    <p className="text-gray-600">Camera intraoral 3D sem moldes de massinha desconfortáveis.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -348,7 +486,7 @@ export default function App() {
       </section>
 
       {/* Section 4: Diferenciais */}
-      <section id="diferenciais" className="py-24 bg-white">
+      <section id="diferenciais" className="scroll-mt-[4.75rem] sm:scroll-mt-28 md:scroll-mt-32 lg:scroll-mt-32 xl:scroll-mt-36 py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[#1a457c] mb-6">
@@ -397,7 +535,7 @@ export default function App() {
               </div>
               <h3 className="text-xl font-bold text-[#1a457c] mb-4">Planejamento digital 3D</h3>
               <p className="text-gray-600">
-                Uso de scanner 3D e Design Digital do Sorriso. Você aprova o resultado final na tela do computador antes mesmo de iniciar o tratamento.
+                Uso de Camera Intraoral e Design Digital do Sorriso. Você aprova o resultado final na tela do computador antes mesmo de iniciar o tratamento.
               </p>
             </div>
           </div>
@@ -405,55 +543,66 @@ export default function App() {
       </section>
 
       {/* Section 5: Comparação */}
-      <section className="py-24 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1a457c] mb-6">
+          <div className="mx-auto mb-8 max-w-[22rem] text-center sm:max-w-2xl md:mb-12 md:max-w-none">
+            <h2 className="text-balance text-lg font-bold leading-snug tracking-tight text-[#1a457c] sm:text-xl sm:leading-snug md:text-[1.65rem] md:leading-tight lg:text-3xl">
               Tratamento Convencional vs. Estética Avançada com Dr. Marcus
             </h2>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+          {/* Mobile: cartões empilhados (sem scroll horizontal) */}
+          <div className="flex flex-col gap-3.5 md:hidden">
+            {COMPARISON_ROWS.map((row) => (
+              <article
+                key={row.trait}
+                className="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-md"
+              >
+                <h3 className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-left text-sm font-bold text-[#1a457c]">
+                  {row.trait}
+                </h3>
+                <div className="space-y-3 px-4 py-4">
+                  <div>
+                    <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400">
+                      Tratamento convencional
+                    </p>
+                    <p className="text-sm leading-relaxed text-gray-600">{row.conventional}</p>
+                  </div>
+                  <div className="rounded-xl border border-blue-100 bg-blue-50/90 px-3 py-3">
+                    <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-[#1a457c]/75">
+                      OdontoSmart
+                    </p>
+                    <p className="text-sm font-semibold leading-relaxed text-[#1a457c]">{row.odonto}</p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Desktop: tabela */}
+          <div className="hidden overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl md:block">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full border-collapse text-left">
                 <thead>
                   <tr>
-                    <th className="p-6 bg-gray-50 text-gray-500 font-medium w-1/3 border-b border-gray-200">Característica</th>
-                    <th className="p-6 bg-gray-100 text-gray-600 font-bold w-1/3 border-b border-gray-200 text-center">Tratamento Convencional</th>
-                    <th className="p-6 bg-[#1a457c] text-white font-bold w-1/3 border-b border-[#1a457c] text-center">OdontoSmart</th>
+                    <th className="w-1/3 border-b border-gray-200 bg-gray-50 p-6 font-medium text-gray-500">Característica</th>
+                    <th className="w-1/3 border-b border-gray-200 bg-gray-100 p-6 text-center font-bold text-gray-600">
+                      Tratamento Convencional
+                    </th>
+                    <th className="w-1/3 border-b border-[#1a457c] bg-[#1a457c] p-6 text-center font-bold text-white">OdontoSmart</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-600">
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="p-6 font-medium">Planejamento</td>
-                    <td className="p-6 text-center">Moldes de massinha (desconfortáveis)</td>
-                    <td className="p-6 text-center font-bold text-[#1a457c] bg-blue-50/50">Scanner 3D Digital (rápido e limpo)</td>
-                  </tr>
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="p-6 font-medium">Previsibilidade</td>
-                    <td className="p-6 text-center">Surpresa no final do tratamento</td>
-                    <td className="p-6 text-center font-bold text-[#1a457c] bg-blue-50/50">Aprova o sorriso antes de começar (DDS)</td>
-                  </tr>
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="p-6 font-medium">Naturalidade</td>
-                    <td className="p-6 text-center">Dentes opacos e artificiais ("tecla de piano")</td>
-                    <td className="p-6 text-center font-bold text-[#1a457c] bg-blue-50/50">Translucidez e textura de dente natural</td>
-                  </tr>
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="p-6 font-medium">Dor no implante</td>
-                    <td className="p-6 text-center">Pós-operatório doloroso e inchado</td>
-                    <td className="p-6 text-center font-bold text-[#1a457c] bg-blue-50/50">Cirurgia guiada minimamente invasiva</td>
-                  </tr>
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="p-6 font-medium">Tempo de resultado</td>
-                    <td className="p-6 text-center">Meses de espera</td>
-                    <td className="p-6 text-center font-bold text-[#1a457c] bg-blue-50/50">Dias (ou até carga imediata)</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="p-6 font-medium rounded-bl-3xl">Durabilidade</td>
-                    <td className="p-6 text-center">Manutenção frequente</td>
-                    <td className="p-6 text-center font-bold text-[#1a457c] bg-blue-50/50 rounded-br-3xl">Materiais premium de altíssima duração</td>
-                  </tr>
+                  {COMPARISON_ROWS.map((row, i) => (
+                    <tr
+                      key={row.trait}
+                      className={`border-b border-gray-100 transition-colors hover:bg-gray-50 ${i === COMPARISON_ROWS.length - 1 ? 'border-b-0' : ''}`}
+                    >
+                      <td className="p-6 font-medium">{row.trait}</td>
+                      <td className="p-6 text-center">{row.conventional}</td>
+                      <td className="bg-blue-50/50 p-6 text-center font-bold text-[#1a457c]">{row.odonto}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -508,7 +657,7 @@ export default function App() {
               <div>
                 <h3 className="text-xl font-bold text-white mb-3">Planejamento Digital Completo</h3>
                 <p className="text-blue-100 leading-relaxed text-sm lg:text-base">
-                  Realizamos todos os exames no local: scanner 3D, Design Digital do Sorriso e análise completa. Tudo rápido, indolor e em um só lugar.
+                  Realizamos todos os exames no local: Camera Intraoral, Design Digital do Sorriso e análise completa. Tudo rápido, indolor e em um só lugar.
                 </p>
               </div>
             </div>
@@ -528,7 +677,7 @@ export default function App() {
           </div>
 
           <div className="mt-20 text-center">
-            <Button className="px-8 py-4 text-lg shadow-xl shadow-[#25D366]/20">
+            <Button href={WHATSAPP_URL} className="px-8 py-4 text-lg shadow-xl shadow-[#25D366]/20">
               QUERO AGENDAR A MINHA CONSULTA
             </Button>
           </div>
@@ -548,7 +697,7 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-            {/* Card 1: Scanner (Large) */}
+            {/* Card 1: Camera intraoral (Large) */}
             <div className="md:col-span-4 bg-gradient-to-br from-[#1a457c] to-[#12315a] p-8 md:p-10 rounded-3xl shadow-lg text-white relative overflow-hidden group">
               <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
               <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8 h-full">
@@ -556,7 +705,7 @@ export default function App() {
                   <Activity className="w-12 h-12 text-[#38bdf8]" />
                 </div>
                 <div>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Scanner intraoral 3D</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Camera intraoral 3D</h3>
                   <p className="text-blue-100 text-lg leading-relaxed">
                     Mapeamento preciso da sua boca em minutos, eliminando os antigos e desconfortáveis moldes de massa. Mais conforto e precisão milimétrica para o seu tratamento.
                   </p>
@@ -651,7 +800,7 @@ export default function App() {
               <p className="text-red-600 font-bold text-lg mb-6">
                 Atenção: Quanto antes você resolve, mais simples, rápido e barato fica o tratamento.
               </p>
-              <Button className="px-8 py-4 text-lg w-full sm:w-auto">
+              <Button href={WHATSAPP_URL} className="px-8 py-4 text-lg w-full sm:w-auto">
                 QUERO AGENDAR A MINHA CONSULTA
               </Button>
             </div>
@@ -689,21 +838,30 @@ export default function App() {
                   
                   <div>
                     <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Contato</h4>
-                    <p className="text-lg text-gray-700 font-medium">[NÚMERO]</p>
+                    <a
+                      href={WHATSAPP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-lg text-gray-700 font-medium text-[#1a457c] underline-offset-2 hover:underline"
+                    >
+                      +55 61 8230-0181
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
             
             <div className="flex flex-col gap-4 w-full md:w-auto">
-              <a href="https://maps.app.goo.gl/pJZdLXvTqqciS7Mr7" target="_blank" rel="noopener noreferrer" className="w-full">
-                <Button variant="outline" className="px-8 py-4 w-full">
-                  <MapPin className="w-5 h-5 mr-2" />
-                  Ver no Google Maps
-                </Button>
-              </a>
-              <Button className="px-8 py-4 w-full">
-                <MessageCircle className="w-5 h-5 mr-2" />
+              <Button
+                variant="outline"
+                href="https://maps.app.goo.gl/pJZdLXvTqqciS7Mr7"
+                className="px-8 py-4 w-full"
+              >
+                <MapPin className="w-5 h-5 mr-2" />
+                Ver no Google Maps
+              </Button>
+              <Button href={WHATSAPP_URL} className="px-8 py-4 w-full">
+                <WhatsAppIcon className="w-5 h-5 shrink-0 mr-2" />
                 Falar no WhatsApp
               </Button>
             </div>
@@ -736,7 +894,7 @@ export default function App() {
             Você tem duas escolhas agora: continuar escondendo o seu sorriso nas fotos e sentindo desconforto ao mastigar, ou tomar a decisão de transformar a sua vida com a equipe da OdontoSmart.
           </p>
           
-          <Button className="px-10 py-5 text-xl w-full sm:w-auto mb-12 shadow-2xl shadow-[#25D366]/20">
+          <Button href={WHATSAPP_URL} className="px-10 py-5 text-xl w-full sm:w-auto mb-12 shadow-2xl shadow-[#25D366]/20">
             QUERO TRANSFORMAR MEU SORRISO AGORA
           </Button>
           
@@ -766,7 +924,7 @@ export default function App() {
       </section>
 
       {/* Section 11: FAQ */}
-      <section id="faq" className="py-24 bg-white">
+      <section id="faq" className="scroll-mt-[4.75rem] sm:scroll-mt-28 md:scroll-mt-32 lg:scroll-mt-32 xl:scroll-mt-36 py-24 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-[#1a457c] mb-6">
@@ -829,46 +987,89 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0f294a] text-white pt-20 pb-10 border-t-4 border-[#38bdf8]">
+      <footer className="bg-[#0f294a] text-white pt-10 pb-6 border-t-4 border-[#38bdf8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-            {/* Col 1 */}
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <Smile className="w-8 h-8 text-[#38bdf8]" />
-                <span className="text-2xl font-bold text-white tracking-tight">OdontoSmart</span>
-              </div>
-              <p className="text-blue-200 text-sm leading-relaxed mb-6">
+          <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-10 lg:gap-y-8">
+            {/* Col 1 — marca (layout alinhado ao Logo-Def) */}
+            <div className="min-w-0 lg:max-w-none">
+              <a
+                href="#"
+                className="mb-1.5 flex max-w-full items-center gap-3 sm:gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f294a] rounded-md"
+                aria-label="OdontoSmart — Sorriso em excelência"
+              >
+                <img
+                  src="/logo-icon.png"
+                  alt=""
+                  className="h-[3.25rem] w-auto shrink-0 object-contain brightness-0 invert sm:h-[3.75rem] md:h-[4.25rem] lg:h-[4.75rem] xl:h-[5.25rem]"
+                  width={112}
+                  height={112}
+                  decoding="async"
+                />
+                <div className="min-w-0 flex-1 text-left font-[Montserrat,sans-serif]">
+                  <span className="block text-[1.35rem] uppercase leading-[1.05] tracking-[-0.02em] text-white sm:text-[1.5rem] md:text-[1.65rem] lg:text-[1.75rem] xl:text-[1.9rem]">
+                    <span className="font-bold">ODONTO</span>
+                    <span className="font-medium">SMART</span>
+                  </span>
+                  <div className="mt-[0.35rem] flex items-center gap-2 sm:mt-1 sm:gap-2.5">
+                    <span
+                      className="h-px min-w-[2rem] flex-1 bg-white/85 sm:min-w-[2.5rem]"
+                      aria-hidden
+                    />
+                    <span className="shrink-0 text-[0.5rem] font-normal uppercase leading-none tracking-[0.22em] text-white sm:text-[0.5625rem] md:text-[0.625rem]">
+                      SORRISO EM EXCELÊNCIA
+                    </span>
+                  </div>
+                </div>
+              </a>
+              <p className="text-blue-200 text-sm leading-snug mt-0 mb-4">
                 Transformando sorrisos e resgatando a autoestima com tecnologia de ponta, especialistas renomados e atendimento humanizado.
               </p>
-              <div className="flex gap-4">
-                <a href="#" className="bg-white/10 p-3 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors">
+              <div className="flex gap-3">
+                <a
+                  href="https://www.instagram.com/odontosmart.santamaria"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors"
+                  aria-label="Instagram OdontoSmart Santa Maria"
+                >
                   <Instagram className="w-5 h-5" />
                 </a>
-                <a href="#" className="bg-white/10 p-3 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors">
-                  <MessageCircle className="w-5 h-5" />
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors"
+                  aria-label="WhatsApp — agendamento"
+                >
+                  <WhatsAppIcon className="h-5 w-5 shrink-0" />
                 </a>
-                <a href="#" className="bg-white/10 p-3 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors">
+                <a
+                  href="https://www.facebook.com/odontosmart.santamariadf/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors"
+                  aria-label="Facebook OdontoSmart Santa Maria"
+                >
                   <Facebook className="w-5 h-5" />
                 </a>
               </div>
             </div>
 
             {/* Col 2 */}
-            <div>
-              <h4 className="text-lg font-bold mb-6 text-white">Navegação</h4>
-              <ul className="space-y-3 text-blue-200">
+            <div className="min-w-0">
+              <h4 className="text-base font-bold mb-3 text-white">Navegação</h4>
+              <ul className="space-y-2 text-blue-200">
                 <li><a href="#" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2"><ArrowRight className="w-4 h-4" /> Home</a></li>
                 <li><a href="#tratamentos" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2"><ArrowRight className="w-4 h-4" /> Tratamentos</a></li>
-                <li><a href="#" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2"><ArrowRight className="w-4 h-4" /> Consulta</a></li>
+                <li><a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2"><ArrowRight className="w-4 h-4" /> Consulta</a></li>
               </ul>
             </div>
 
             {/* Col 3 */}
-            <div>
-              <h4 className="text-lg font-bold mb-6 text-white">Tecnologias</h4>
-              <ul className="space-y-3 text-blue-200">
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Scanner Intraoral 3D</li>
+            <div className="min-w-0">
+              <h4 className="text-base font-bold mb-3 text-white">Tecnologias</h4>
+              <ul className="space-y-2 text-blue-200">
+                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Camera Intraoral 3D</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Design Digital do Sorriso</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Cirurgia Guiada</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Clareamento LED</li>
@@ -876,18 +1077,18 @@ export default function App() {
             </div>
 
             {/* Col 4 */}
-            <div>
-              <h4 className="text-lg font-bold mb-6 text-white">Atendimento</h4>
-              <ul className="space-y-4 text-blue-200">
+            <div className="min-w-0">
+              <h4 className="text-base font-bold mb-3 text-white">Atendimento</h4>
+              <ul className="space-y-3 text-blue-200">
                 <li className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-[#38bdf8] flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-white">Horários</p>
-                    <p className="text-sm">Seg a Sex: 8h às 18h</p>
-                    <p className="text-sm">Sábados: 8h às 12h</p>
+                    <p className="text-sm">Seg a Sex: 9h às 18h</p>
+                    <p className="text-sm">Sábados: 9h às 12h</p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3 mt-4">
+                <li className="flex items-start gap-3 mt-2">
                   <ShieldCheck className="w-5 h-5 text-[#38bdf8] flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-white">Convênios</p>
@@ -898,12 +1099,13 @@ export default function App() {
             </div>
           </div>
 
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-blue-300">
+          <div className="border-t border-white/10 pt-5 flex flex-col md:flex-row justify-between items-center gap-3 text-sm text-blue-300">
             <p>© {new Date().getFullYear()} OdontoSmart. Todos os direitos reservados.</p>
             <p>Responsável Técnico: Dr. Marcus - CRO [NÚMERO]</p>
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

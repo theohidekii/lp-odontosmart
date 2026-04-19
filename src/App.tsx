@@ -49,12 +49,16 @@ const COMPARISON_ROWS = [
 
 const HERO_CAROUSEL_SLIDES = [
   {
-    src: '/img-1-carrossel.jpeg',
-    alt: 'Antes e depois do tratamento: evolução do sorriso com estética avançada.',
+    src: '/Lente.jpeg',
+    alt: 'Antes e depois da lente de contato dental.',
   },
   {
-    src: '/img-2-carrossel.jpeg',
+    src: '/clareamento.jpeg',
     alt: 'Antes e depois de clareamento dental realizado na clínica.',
+  },
+  {
+    src: '/aparelho dental.jpeg',
+    alt: 'Tratamento com aparelho dental.',
   },
 ] as const;
 
@@ -74,7 +78,7 @@ function HeroCarousel() {
   };
 
   return (
-    <div className="relative h-[280px] w-full sm:h-[360px] lg:h-[460px]">
+    <div className="relative h-[340px] w-full sm:h-[440px] lg:h-[560px]">
       {HERO_CAROUSEL_SLIDES.map((slide, idx) => (
         <img
           key={slide.src}

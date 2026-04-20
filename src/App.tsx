@@ -37,6 +37,38 @@ const WHATSAPP_GREEN = '#25D366';
 const WHATSAPP_E164 = '556182300181';
 const WHATSAPP_PRESET_MESSAGE = 'Olá, quero fazer um agendamento';
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_E164}?text=${encodeURIComponent(WHATSAPP_PRESET_MESSAGE)}`;
+const GOOGLE_ADS_ID = 'AW-10784260927';
+
+function isWhatsAppLink(href?: string) {
+  if (!href) return false;
+  return href.includes('wa.me') || href.includes('whatsapp.com');
+}
+
+function trackWhatsAppClick() {
+  if (typeof window === 'undefined') return;
+
+  const w = window as Window & {
+    fbq?: (...args: any[]) => void;
+    gtag?: (...args: any[]) => void;
+  };
+
+  if (typeof w.fbq === 'function') {
+    w.fbq('track', 'Lead', {
+      content_name: 'whatsapp_click',
+      content_category: 'contact',
+    });
+  }
+
+  if (typeof w.gtag === 'function') {
+    w.gtag('event', 'generate_lead', {
+      event_category: 'engagement',
+      event_label: 'whatsapp_click',
+    });
+    w.gtag('event', 'conversion', {
+      send_to: GOOGLE_ADS_ID,
+    });
+  }
+}
 
 const COMPARISON_ROWS = [
   { trait: 'Planejamento', conventional: 'Moldes de massinha (desconfortáveis)', odonto: 'Camera Intraoral (rápido e limpo)' },
@@ -49,15 +81,15 @@ const COMPARISON_ROWS = [
 
 const HERO_CAROUSEL_SLIDES = [
   {
-    src: '/Lente.jpeg',
+    src: '/Lente.webp',
     alt: 'Antes e depois da lente de contato dental.',
   },
   {
-    src: '/clareamento.jpeg',
+    src: '/clareamento.webp',
     alt: 'Antes e depois de clareamento dental realizado na clínica.',
   },
   {
-    src: '/aparelho dental.jpeg',
+    src: '/aparelho-dental.webp',
     alt: 'Tratamento com aparelho dental.',
   },
 ] as const;
@@ -85,6 +117,7 @@ function HeroCarousel() {
           src={slide.src}
           alt={slide.alt}
           loading={idx === 0 ? 'eager' : 'lazy'}
+          fetchPriority={idx === 0 ? 'high' : 'auto'}
           decoding="async"
           className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ease-out ${
             idx === active ? 'z-[1] opacity-100' : 'z-0 opacity-0'
@@ -122,10 +155,14 @@ function HeroCarousel() {
             aria-selected={idx === active}
             aria-label={`Imagem ${idx + 1} de ${len}`}
             onClick={() => setActive(idx)}
-            className={`h-2 rounded-full transition-all ${
-              idx === active ? 'w-8 bg-white shadow' : 'w-2 bg-white/50 hover:bg-white/80'
-            }`}
-          />
+            className="flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white/90"
+          >
+            <span
+              className={`block h-2 rounded-full transition-all ${
+                idx === active ? 'w-8 bg-white shadow' : 'w-2 bg-white/75 hover:bg-white'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>
@@ -148,10 +185,10 @@ function WhatsAppIcon({ className, ...props }: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function Button({ children, className = '', variant = 'primary', href, ...props }: any) {
+function Button({ children, className = '', variant = 'primary', href, onClick, ...props }: any) {
   const baseStyle = "inline-flex items-center justify-center font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1";
   const variants = {
-    primary: "bg-[#25D366] text-white hover:bg-[#20bd5a]",
+    primary: "bg-[#166534] text-white hover:bg-[#14532d]",
     secondary: "bg-[#1a457c] text-white hover:bg-[#12315a]",
     outline: "border-2 border-[#1a457c] text-[#1a457c] hover:bg-[#1a457c] hover:text-white"
   };
@@ -159,7 +196,19 @@ function Button({ children, className = '', variant = 'primary', href, ...props 
 
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={cls} {...props}>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cls}
+        onClick={(event) => {
+          if (isWhatsAppLink(href)) {
+            trackWhatsAppClick();
+          }
+          onClick?.(event);
+        }}
+        {...props}
+      >
         {children}
       </a>
     );
@@ -203,7 +252,7 @@ export default function App() {
             aria-label="OdontoSmart — Sorriso em excelência"
           >
             <img
-              src="/logo-icon.png"
+              src="/logo-icon.webp"
               alt=""
               className="h-11 w-auto shrink-0 object-contain sm:h-[3.25rem] md:h-[3.75rem] lg:h-[4.25rem] xl:h-[4.75rem]"
               width={112}
@@ -227,9 +276,9 @@ export default function App() {
             </div>
           </a>
           <div className="hidden md:flex items-center gap-6 lg:gap-7">
-            <a href="#tratamentos" className="text-gray-600 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight">Tratamentos</a>
-            <a href="#diferenciais" className="text-gray-600 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight">Diferenciais</a>
-            <a href="#faq" className="text-gray-600 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight">Dúvidas</a>
+            <a href="#tratamentos" className="text-gray-700 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a457c] rounded-sm">Tratamentos</a>
+            <a href="#diferenciais" className="text-gray-700 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a457c] rounded-sm">Diferenciais</a>
+            <a href="#faq" className="text-gray-700 hover:text-[#1a457c] font-semibold transition-colors text-base lg:text-lg leading-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a457c] rounded-sm">Dúvidas</a>
             <Button href={WHATSAPP_URL} className="px-5 py-2.5 text-sm lg:text-base min-h-0 shadow-md hover:shadow-lg hover:-translate-y-px">
               <WhatsAppIcon className="w-4 h-4 shrink-0 lg:w-5 lg:h-5 mr-2" />
               Agendar Consulta
@@ -238,7 +287,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="pt-[4.5rem] sm:pt-24 md:pt-28 lg:pt-28 xl:pt-32">
+      <main className="pt-[4.5rem] sm:pt-24 md:pt-28 lg:pt-28 xl:pt-32">
       {/* Section 1: Hero */}
       <section className="relative pt-0 pb-20 lg:pb-32 overflow-hidden bg-white">
         {/* Subtle background glow */}
@@ -302,7 +351,7 @@ export default function App() {
                     <StarIcon className="h-5 w-5 md:h-6 md:w-6" />
                   </div>
                   <div className="min-w-0 text-left">
-                    <p className="text-[0.65rem] font-medium uppercase tracking-wider text-gray-500 md:text-xs">Avaliação</p>
+                  <p className="text-[0.65rem] font-medium uppercase tracking-wider text-gray-700 md:text-xs">Avaliação</p>
                     <p className="text-sm font-bold text-[#1a457c] md:text-lg">5.0 no Google</p>
                   </div>
                 </div>
@@ -324,14 +373,16 @@ export default function App() {
             <div className="w-full md:w-5/12 relative flex justify-center md:justify-start">
               <div className="relative -mt-20 md:-mt-28 z-10 w-full max-w-[320px] md:max-w-none">
                 <img 
-                  src="/image-section-problema.png"
+                  src="/image-section-problema.webp"
                   alt="Retrato profissional de dentista masculino sorrindo, com jaqueta azul em consultório moderno."
                   className="w-full h-[350px] md:h-[450px] object-cover object-[center_35%] rounded-[2rem] shadow-2xl border-4 md:border-8 border-white bg-white"
+                  loading="lazy"
+                  decoding="async"
                 />
                 {/* White card overlapping */}
                 <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[85%] bg-white rounded-2xl p-4 md:p-5 shadow-xl text-center border border-gray-100">
                   <p className="font-bold text-[#1a457c] text-lg md:text-xl">Dr. Marcus</p>
-                  <p className="text-sm md:text-base text-gray-500 font-medium">Especialista em Estética</p>
+                  <p className="text-sm md:text-base text-gray-700 font-medium">Especialista em Estética</p>
                 </div>
               </div>
             </div>
@@ -341,11 +392,11 @@ export default function App() {
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
                 Você não está sozinho nessa insatisfação
               </h2>
-              <p className="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed">
+              <p className="text-lg md:text-xl text-blue-50 mb-8 leading-relaxed">
                 Muitas pessoas deixam de aproveitar os melhores momentos da vida por vergonha do próprio sorriso. Estima-se que mais de 50% dos brasileiros adultos apresentam alguma insatisfação. <br className="hidden md:block" /><br className="hidden md:block" />
                 <span className="font-semibold text-white">Mas a solução é muito mais simples, rápida e indolor do que você imagina.</span>
               </p>
-              <Button href={WHATSAPP_URL} className="px-8 py-4 text-sm sm:text-base md:text-lg w-full sm:w-auto shadow-xl shadow-[#25D366]/20">
+              <Button href={WHATSAPP_URL} className="px-8 py-4 text-sm sm:text-base md:text-lg w-full sm:w-auto bg-[#22c55e] hover:bg-[#16a34a] border border-[#86efac]/80 shadow-[0_14px_32px_rgba(34,197,94,0.45)]">
                 QUERO FAZER MINHA CONSULTA
               </Button>
             </div>
@@ -427,7 +478,7 @@ export default function App() {
                     <Search className="w-6 h-6 text-[#1a457c]" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-[#1a457c] mb-1">Consulta digital completa</h4>
+                    <h3 className="text-xl font-bold text-[#1a457c] mb-1">Consulta digital completa</h3>
                     <p className="text-gray-600">Camera intraoral 3D sem moldes de massinha desconfortáveis.</p>
                   </div>
                 </div>
@@ -436,7 +487,7 @@ export default function App() {
                     <ShieldCheck className="w-6 h-6 text-[#1a457c]" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-[#1a457c] mb-1">Implantes dentários de titânio</h4>
+                    <h3 className="text-xl font-bold text-[#1a457c] mb-1">Implantes dentários de titânio</h3>
                     <p className="text-gray-600">Substituem definitivamente o dente perdido com estabilidade total.</p>
                   </div>
                 </div>
@@ -445,7 +496,7 @@ export default function App() {
                     <Sparkles className="w-6 h-6 text-[#1a457c]" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-[#1a457c] mb-1">Lentes de contato dental</h4>
+                    <h3 className="text-xl font-bold text-[#1a457c] mb-1">Lentes de contato dental</h3>
                     <p className="text-gray-600">Facetas ultrafinas personalizadas para corrigir cor, formato e alinhamento.</p>
                   </div>
                 </div>
@@ -454,7 +505,7 @@ export default function App() {
                     <Zap className="w-6 h-6 text-[#1a457c]" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold text-[#1a457c] mb-1">Clareamento profissional</h4>
+                    <h3 className="text-xl font-bold text-[#1a457c] mb-1">Clareamento profissional</h3>
                     <p className="text-gray-600">Clareia até 8 tons em uma única sessão de alto impacto.</p>
                   </div>
                 </div>
@@ -468,18 +519,18 @@ export default function App() {
                 <h3 className="text-2xl md:text-3xl font-bold mb-6">
                   O resultado? Você passa a sorrir com confiança.
                 </h3>
-                <p className="text-lg text-blue-100 mb-6">
+                <p className="text-lg text-blue-50 mb-6">
                   A transformação é visível desde a primeira sessão. Sem dor, sem resultados artificiais e com a garantia de um trabalho feito por especialistas.
                 </p>
-                <div className="flex items-center gap-4 text-blue-200 font-medium">
+                <div className="flex items-center gap-4 text-blue-100 font-medium">
                   <Check className="w-5 h-5 text-[#38bdf8]" />
                   <span>Sorriso natural</span>
                 </div>
-                <div className="flex items-center gap-4 text-blue-200 font-medium mt-3">
+                <div className="flex items-center gap-4 text-blue-100 font-medium mt-3">
                   <Check className="w-5 h-5 text-[#38bdf8]" />
                   <span>Mastigação perfeita</span>
                 </div>
-                <div className="flex items-center gap-4 text-blue-200 font-medium mt-3">
+                <div className="flex items-center gap-4 text-blue-100 font-medium mt-3">
                   <Check className="w-5 h-5 text-[#38bdf8]" />
                   <span>Autoestima renovada</span>
                 </div>
@@ -567,7 +618,7 @@ export default function App() {
                 </h3>
                 <div className="space-y-3 px-4 py-4">
                   <div>
-                    <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400">
+                    <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-gray-600">
                       Tratamento convencional
                     </p>
                     <p className="text-sm leading-relaxed text-gray-600">{row.conventional}</p>
@@ -634,7 +685,7 @@ export default function App() {
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Seu novo sorriso em 3 passos simples
             </h2>
-            <p className="text-lg md:text-xl text-blue-100">
+            <p className="text-lg md:text-xl text-blue-50">
               Rápido, sem burocracia e 100% focado no seu bem-estar!
             </p>
           </div>
@@ -647,7 +698,7 @@ export default function App() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white mb-3">Agende sua Consulta</h3>
-                <p className="text-blue-100 leading-relaxed text-sm lg:text-base">
+                <p className="text-blue-50 leading-relaxed text-sm lg:text-base">
                   O contato é rápido pelo WhatsApp, sem taxa de consulta. Você passará por uma consulta pessoal e detalhada diretamente com o Dr. Marcus.
                 </p>
               </div>
@@ -660,7 +711,7 @@ export default function App() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white mb-3">Planejamento Digital Completo</h3>
-                <p className="text-blue-100 leading-relaxed text-sm lg:text-base">
+                <p className="text-blue-50 leading-relaxed text-sm lg:text-base">
                   Realizamos todos os exames no local: Camera Intraoral, Design Digital do Sorriso e análise completa. Tudo rápido, indolor e em um só lugar.
                 </p>
               </div>
@@ -673,7 +724,7 @@ export default function App() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white mb-3">Realize seu Tratamento</h3>
-                <p className="text-blue-100 leading-relaxed text-sm lg:text-base">
+                <p className="text-blue-50 leading-relaxed text-sm lg:text-base">
                   Implante com dente provisório no mesmo dia, lentes em 2-3 sessões ou clareamento imediato. Você sai da clínica com o sorriso transformado.
                 </p>
               </div>
@@ -681,7 +732,7 @@ export default function App() {
           </div>
 
           <div className="mt-20 text-center">
-            <Button href={WHATSAPP_URL} className="px-8 py-4 text-lg shadow-xl shadow-[#25D366]/20">
+            <Button href={WHATSAPP_URL} className="px-8 py-4 text-lg bg-[#22c55e] hover:bg-[#16a34a] border border-[#86efac]/80 shadow-[0_14px_32px_rgba(34,197,94,0.45)]">
               QUERO AGENDAR A MINHA CONSULTA
             </Button>
           </div>
@@ -710,7 +761,7 @@ export default function App() {
                 </div>
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold mb-4">Camera intraoral 3D</h3>
-                  <p className="text-blue-100 text-lg leading-relaxed">
+                  <p className="text-blue-50 text-lg leading-relaxed">
                     Mapeamento preciso da sua boca em minutos, eliminando os antigos e desconfortáveis moldes de massa. Mais conforto e precisão milimétrica para o seu tratamento.
                   </p>
                 </div>
@@ -801,7 +852,7 @@ export default function App() {
             </div>
 
             <div className="text-center">
-              <p className="text-red-600 font-bold text-lg mb-6">
+              <p className="text-red-800 font-bold text-lg mb-6">
                 Atenção: Quanto antes você resolve, mais simples, rápido e barato fica o tratamento.
               </p>
               <Button href={WHATSAPP_URL} className="px-8 py-4 text-lg w-full sm:w-auto">
@@ -824,13 +875,13 @@ export default function App() {
               
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Endereço</h4>
+                  <p className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Endereço</p>
                   <p className="text-lg text-gray-700 font-medium">CL 116 G14, 1ºAndar - Santa Maria, Brasília - DF, 72546-200</p>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-8">
                   <div>
-                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Horário de Atendimento</h4>
+                    <p className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Horário de Atendimento</p>
                     <div className="flex items-start gap-2 text-gray-700">
                       <Clock className="w-5 h-5 text-[#1a457c] mt-0.5" />
                       <div>
@@ -841,11 +892,12 @@ export default function App() {
                   </div>
                   
                   <div>
-                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Contato</h4>
+                    <p className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">Contato</p>
                     <a
                       href={WHATSAPP_URL}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={trackWhatsAppClick}
                       className="text-lg text-gray-700 font-medium text-[#1a457c] underline-offset-2 hover:underline"
                     >
                       +55 61 8230-0181
@@ -891,14 +943,14 @@ export default function App() {
             <span className="text-[#38bdf8]">E você merece se olhar no espelho com orgulho.</span>
           </h2>
           
-          <p className="text-xl text-blue-100 mb-6 leading-relaxed">
+          <p className="text-xl text-blue-50 mb-6 leading-relaxed">
             Adiar essa decisão apenas prolonga a sua insatisfação e insegurança.
           </p>
-          <p className="text-lg text-blue-200 mb-12">
+          <p className="text-lg text-blue-100 mb-12">
             Você tem duas escolhas agora: continuar escondendo o seu sorriso nas fotos e sentindo desconforto ao mastigar, ou tomar a decisão de transformar a sua vida com a equipe da OdontoSmart.
           </p>
           
-          <Button href={WHATSAPP_URL} className="px-10 py-5 text-xl w-full sm:w-auto mb-12 shadow-2xl shadow-[#25D366]/20">
+          <Button href={WHATSAPP_URL} className="px-10 py-5 text-xl w-full sm:w-auto mb-12 bg-[#22c55e] hover:bg-[#16a34a] border border-[#86efac]/80 shadow-[0_16px_36px_rgba(34,197,94,0.5)]">
             QUERO TRANSFORMAR MEU SORRISO AGORA
           </Button>
           
@@ -991,6 +1043,8 @@ export default function App() {
       </section>
 
       {/* Footer */}
+      </main>
+
       <footer className="bg-[#0f294a] text-white pt-10 pb-6 border-t-4 border-[#38bdf8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-10 lg:gap-y-8">
@@ -1002,7 +1056,7 @@ export default function App() {
                 aria-label="OdontoSmart — Sorriso em excelência"
               >
                 <img
-                  src="/logo-icon.png"
+                  src="/logo-icon.webp"
                   alt=""
                   className="h-[3.25rem] w-auto shrink-0 object-contain brightness-0 invert sm:h-[3.75rem] md:h-[4.25rem] lg:h-[4.75rem] xl:h-[5.25rem]"
                   width={112}
@@ -1025,7 +1079,7 @@ export default function App() {
                   </div>
                 </div>
               </a>
-              <p className="text-blue-200 text-sm leading-snug mt-0 mb-4">
+              <p className="text-blue-100 text-sm leading-snug mt-0 mb-4">
                 Transformando sorrisos e resgatando a autoestima com tecnologia de ponta, especialistas renomados e atendimento humanizado.
               </p>
               <div className="flex gap-3">
@@ -1033,7 +1087,7 @@ export default function App() {
                   href="https://www.instagram.com/odontosmart.santamaria"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors"
+                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8]"
                   aria-label="Instagram OdontoSmart Santa Maria"
                 >
                   <Instagram className="w-5 h-5" />
@@ -1042,7 +1096,8 @@ export default function App() {
                   href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors"
+                  onClick={trackWhatsAppClick}
+                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8]"
                   aria-label="WhatsApp — agendamento"
                 >
                   <WhatsAppIcon className="h-5 w-5 shrink-0" />
@@ -1051,7 +1106,7 @@ export default function App() {
                   href="https://www.facebook.com/odontosmart.santamariadf/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors"
+                  className="bg-white/10 p-2.5 rounded-lg hover:bg-[#38bdf8] hover:text-[#0f294a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8]"
                   aria-label="Facebook OdontoSmart Santa Maria"
                 >
                   <Facebook className="w-5 h-5" />
@@ -1061,18 +1116,18 @@ export default function App() {
 
             {/* Col 2 */}
             <div className="min-w-0">
-              <h4 className="text-base font-bold mb-3 text-white">Navegação</h4>
-              <ul className="space-y-2 text-blue-200">
-                <li><a href="#" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2"><ArrowRight className="w-4 h-4" /> Home</a></li>
-                <li><a href="#tratamentos" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2"><ArrowRight className="w-4 h-4" /> Tratamentos</a></li>
-                <li><a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2"><ArrowRight className="w-4 h-4" /> Consulta</a></li>
+              <h3 className="text-base font-bold mb-3 text-white">Navegação</h3>
+              <ul className="space-y-2 text-blue-100">
+                <li><a href="#" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] rounded-sm"><ArrowRight className="w-4 h-4" /> Home</a></li>
+                <li><a href="#tratamentos" className="hover:text-[#38bdf8] transition-colors flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] rounded-sm"><ArrowRight className="w-4 h-4" /> Tratamentos</a></li>
+                <li><a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={trackWhatsAppClick} className="hover:text-[#38bdf8] transition-colors flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] rounded-sm"><ArrowRight className="w-4 h-4" /> Consulta</a></li>
               </ul>
             </div>
 
             {/* Col 3 */}
             <div className="min-w-0">
-              <h4 className="text-base font-bold mb-3 text-white">Tecnologias</h4>
-              <ul className="space-y-2 text-blue-200">
+              <h3 className="text-base font-bold mb-3 text-white">Tecnologias</h3>
+              <ul className="space-y-2 text-blue-100">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Camera Intraoral 3D</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Design Digital do Sorriso</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Cirurgia Guiada</li>
@@ -1082,8 +1137,8 @@ export default function App() {
 
             {/* Col 4 */}
             <div className="min-w-0">
-              <h4 className="text-base font-bold mb-3 text-white">Atendimento</h4>
-              <ul className="space-y-3 text-blue-200">
+              <h3 className="text-base font-bold mb-3 text-white">Atendimento</h3>
+              <ul className="space-y-3 text-blue-100">
                 <li className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-[#38bdf8] flex-shrink-0 mt-0.5" />
                   <div>
@@ -1105,11 +1160,10 @@ export default function App() {
 
           <div className="border-t border-white/10 pt-5 flex flex-col md:flex-row justify-between items-center gap-3 text-sm text-blue-300">
             <p>© {new Date().getFullYear()} OdontoSmart. Todos os direitos reservados.</p>
-            <p>Responsável Técnico: Dr. Marcus - CRO [NÚMERO]</p>
+            <p>Responsável Técnico: Dr. Marcus - CRO 13193</p>
           </div>
         </div>
       </footer>
-      </div>
     </div>
   );
 }

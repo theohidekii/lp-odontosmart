@@ -252,7 +252,7 @@ export default function App() {
             aria-label="OdontoSmart — Sorriso em excelência"
           >
             <img
-              src="/logo-icon.webp"
+              src="/logo-icon-header.webp"
               alt=""
               className="h-11 w-auto shrink-0 object-contain sm:h-[3.25rem] md:h-[3.75rem] lg:h-[4.25rem] xl:h-[4.75rem]"
               width={112}
@@ -1056,7 +1056,7 @@ export default function App() {
                 aria-label="OdontoSmart — Sorriso em excelência"
               >
                 <img
-                  src="/logo-icon.webp"
+                  src="/logo-icon-footer.webp"
                   alt=""
                   className="h-[3.25rem] w-auto shrink-0 object-contain brightness-0 invert sm:h-[3.75rem] md:h-[4.25rem] lg:h-[4.75rem] xl:h-[5.25rem]"
                   width={112}

@@ -71,7 +71,7 @@ function trackWhatsAppClick() {
 }
 
 const COMPARISON_ROWS = [
-  { trait: 'Planejamento', conventional: 'Moldes de massinha (desconfortáveis)', odonto: 'Camera Intraoral (rápido e limpo)' },
+  { trait: 'Planejamento', conventional: 'Moldes de massinha (desconfortáveis)', odonto: 'Câmera Intraoral (rápido e limpo)' },
   { trait: 'Previsibilidade', conventional: 'Surpresa no final do tratamento', odonto: 'Aprova o sorriso antes de começar (DDS)' },
   { trait: 'Naturalidade', conventional: 'Dentes opacos e artificiais (“tecla de piano”)', odonto: 'Translucidez e textura de dente natural' },
   { trait: 'Dor no implante', conventional: 'Pós-operatório doloroso e inchado', odonto: 'Cirurgia guiada minimamente invasiva' },
@@ -479,7 +479,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-[#1a457c] mb-1">Consulta digital completa</h3>
-                    <p className="text-gray-600">Camera intraoral 3D sem moldes de massinha desconfortáveis.</p>
+                    <p className="text-gray-600">Câmera intraoral 3D sem moldes de massinha desconfortáveis.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -590,7 +590,7 @@ export default function App() {
               </div>
               <h3 className="text-xl font-bold text-[#1a457c] mb-4">Planejamento digital 3D</h3>
               <p className="text-gray-600">
-                Uso de Camera Intraoral e Design Digital do Sorriso. Você aprova o resultado final na tela do computador antes mesmo de iniciar o tratamento.
+                Uso de Câmera Intraoral e Design Digital do Sorriso. Você aprova o resultado final na tela do computador antes mesmo de iniciar o tratamento.
               </p>
             </div>
           </div>
@@ -712,7 +712,7 @@ export default function App() {
               <div>
                 <h3 className="text-xl font-bold text-white mb-3">Planejamento Digital Completo</h3>
                 <p className="text-blue-50 leading-relaxed text-sm lg:text-base">
-                  Realizamos todos os exames no local: Camera Intraoral, Design Digital do Sorriso e análise completa. Tudo rápido, indolor e em um só lugar.
+                  Realizamos todos os exames no local: Câmera Intraoral, Design Digital do Sorriso e análise completa. Tudo rápido, indolor e em um só lugar.
                 </p>
               </div>
             </div>
@@ -752,7 +752,7 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-            {/* Card 1: Camera intraoral (Large) */}
+            {/* Card 1: Câmera intraoral (Large) */}
             <div className="md:col-span-4 bg-gradient-to-br from-[#1a457c] to-[#12315a] p-8 md:p-10 rounded-3xl shadow-lg text-white relative overflow-hidden group">
               <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
               <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8 h-full">
@@ -760,7 +760,7 @@ export default function App() {
                   <Activity className="w-12 h-12 text-[#38bdf8]" />
                 </div>
                 <div>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Camera intraoral 3D</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Câmera intraoral 3D</h3>
                   <p className="text-blue-50 text-lg leading-relaxed">
                     Mapeamento preciso da sua boca em minutos, eliminando os antigos e desconfortáveis moldes de massa. Mais conforto e precisão milimétrica para o seu tratamento.
                   </p>
@@ -1128,7 +1128,7 @@ export default function App() {
             <div className="min-w-0">
               <h3 className="text-base font-bold mb-3 text-white">Tecnologias</h3>
               <ul className="space-y-2 text-blue-100">
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Camera Intraoral 3D</li>
+                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Câmera Intraoral 3D</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Design Digital do Sorriso</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Cirurgia Guiada</li>
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#38bdf8]" /> Clareamento LED</li>

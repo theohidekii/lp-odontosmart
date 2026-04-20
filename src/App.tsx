@@ -1160,7 +1160,7 @@ export default function App() {
 
           <div className="border-t border-white/10 pt-5 flex flex-col md:flex-row justify-between items-center gap-3 text-sm text-blue-300">
             <p>© {new Date().getFullYear()} OdontoSmart. Todos os direitos reservados.</p>
-            <p>Responsável Técnico: Dr. Marcus - CRO 13193</p>
+            <p>Responsável Técnico: Dr. Marcus - CRO-DF 13193</p>
           </div>
         </div>
       </footer>
